@@ -1,5 +1,6 @@
 //This code will be mostly C compliant except for passing by reference, which will be done with &. That is stricly because I find it more elegant.
 #include <stdio.h>
+#include <math.h>
 #include "raylib.h"
 
 // This game prototype will only simulate the chaser side, called Player. In the final game we need both a Player and a Adversary point of view.
@@ -8,7 +9,10 @@
 #define TRAIL_S 50
 #define TRAIL_R 1
 #define ADV_SPD 10
-#define PLR_SPD 6
+#define PLR_SPD 8
+#define POINTSRANGE 55
+#define TEXT_S_MAX 80
+#define TEXT_S_MIN 40
 
 const int screenWidth = 1200;
 const int screenHeight = 720;
@@ -20,9 +24,15 @@ typedef struct GameState {
     Vector2 PlayerPos;
     Vector2 AdversaryPos;
     Vector2 Trail [TRAIL_S];
+    
+    long Points;
+
+    // Is client-sided (doesn't go to network)
+    int TextSize;
 
     // Wont be in the final game.
     int GoDown;
+    int GoRight;
 } GameState;
 
 //Updates the Player's position given input on the arrow keys.
@@ -34,6 +44,9 @@ void UpdateAdversaryPosArbitrary(GameState &S);
 //Makes the trail "trail" behind the Adversary node.
 void UpdateTrailPos(GameState &S);
 
+//Updates the points of the player. Incremented when the player is touching the tail of the trail of the adversary.
+void UpdatePointsCount(GameState &S);
+
 //Will draw a single frame of the game.
 void DrawState(GameState &S);
 
@@ -42,6 +55,9 @@ void InitGame(GameState &S);
 
 //Runs the main game loop (the state update part), which includes updating all positions.
 void GameLoop(GameState &S);
+
+//Returns the euclidean distance of two Vector2 points.
+double EuclideanDistance(Vector2 a, Vector2 b);
 
 int main(void){
     GameState S;
@@ -86,7 +102,9 @@ void InitGame(GameState &S){
     S.PlayerPos = { (float)screenWidth/2, (float)screenHeight/2 };
     S.AdversaryPos = { (float)screenWidth/2 + 40, (float)screenHeight/2 + 40};
 
-    S.GoDown = 1;
+    S.GoDown = 1; S.GoRight = 1;
+    S.Points = 0;
+    S.TextSize = TEXT_S_MIN;
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
 }
@@ -95,6 +113,8 @@ void GameLoop(GameState &S){
     UpdatePlayerPosInput(S);
     UpdateTrailPos(S);
     UpdateAdversaryPosArbitrary(S);
+
+    UpdatePointsCount(S);
 }
 void UpdatePlayerPosInput(GameState &S){
     if (IsKeyDown(KEY_RIGHT)) S.PlayerPos.x += PLR_SPD;
@@ -103,11 +123,17 @@ void UpdatePlayerPosInput(GameState &S){
     if (IsKeyDown(KEY_DOWN)) S.PlayerPos.y += PLR_SPD;
 }
 void UpdateAdversaryPosArbitrary(GameState &S){
+    if(S.AdversaryPos.x < 0){
+        S.GoRight = 1;
+    } else if (S.AdversaryPos.x > screenWidth){
+        S.GoRight = -1;
+    } 
     if(S.AdversaryPos.y < 0){
         S.GoDown = 1;
     } else if (S.AdversaryPos.y > screenHeight){
         S.GoDown = -1;
     } 
+    S.AdversaryPos.x += S.GoRight * ADV_SPD;
     S.AdversaryPos.y += S.GoDown * ADV_SPD;
 }
 void UpdateTrailPos(GameState &S){
@@ -118,12 +144,24 @@ void UpdateTrailPos(GameState &S){
     }
 }
 
+void UpdatePointsCount(GameState &S){
+    // Here TRAIL_S - 5 was chosen arbitrarily as the anchor to count points from.
+    if(EuclideanDistance(S.PlayerPos, S.Trail[TRAIL_S - 5]) < POINTSRANGE){
+        S.Points++;
+        if(S.TextSize < TEXT_S_MAX) S.TextSize += 4;
+        return;
+    }
+    if(S.TextSize > TEXT_S_MIN) S.TextSize -= 2;
+    return;
+}
+
 void DrawState(GameState &S){
     BeginDrawing();
 
     ClearBackground(RAYWHITE);
 
     DrawText("Chase the trail for points!", 10, 10, 20, DARKGRAY);
+
 
     DrawCircleV(S.AdversaryPos, 50, (Color){ 0, 180, 48, 255 } );
     
@@ -133,5 +171,18 @@ void DrawState(GameState &S){
 
     DrawCircleV(S.PlayerPos, 50, MAROON);
 
+    DrawText(TextFormat("%d", S.Points), screenWidth / 2 - MeasureText(TextFormat("%d", S.Points), S.TextSize) / 2, 20, S.TextSize, RED);
+
     EndDrawing();
+}
+
+double EuclideanDistance(Vector2 a, Vector2 b){
+    double x = b.x - a.x;
+    double y = b.y - a.y;
+    double dist;
+
+    dist = pow(x, 2) + pow(y, 2);
+    dist = sqrt(dist);
+
+    return dist;
 }
