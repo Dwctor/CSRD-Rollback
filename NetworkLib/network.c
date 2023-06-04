@@ -202,12 +202,11 @@ int network_send(struct network* nw, struct MESSAGE* m) {
     return send(nw->sender.desc, send_message, strlen(send_message), 0);
 }
 
-struct MESSAGE* network_get(struct network* nw) {
+int network_get(struct MESSAGE* m, struct network* nw) {
     if (nw->last_msg[0] == MESSAGE_BEGIN) {
-        return NULL;
+        return 0;
     }
-    struct MESSAGE* m;
     DESERIALIZE_MESSAGE(m, nw->last_msg);
     nw->last_msg[0] = MESSAGE_BEGIN;
-    return m;
+    return 1;
 }

@@ -24,12 +24,13 @@ int main(int argc, char** argv) {
     int rec_port = atoi(argv[1]);
     int send_port = atoi(argv[2]);
     struct network nw = new_network(rec_port, send_port);
-    struct MESSAGE* m = NULL;
+    struct MESSAGE m;
+    int rec = 0;
     network_start(&nw);
     do {
-        m = network_get(&nw);
-    } while(m == NULL);
-    printf("message after deserialization: %d\n", m->val);
+        rec = network_get(&m, &nw);
+    } while(rec == 0);
+    printf("message after deserialization: %d\n", m.val);
     network_end(&nw);
     return 0;
 }
