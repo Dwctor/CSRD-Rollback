@@ -119,7 +119,7 @@ int handler(char* msg, struct network* nw) {
     return (msg[0] == MESSAGE_EXIT);
 }
 
-int handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
+void handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
     char client_message[BUF_SIZE];
     int exit = 0;
     fprintf(stderr, "Handling messages...\n");
@@ -128,12 +128,12 @@ int handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
         // Receive client's message:
         if (recv(nw->client.desc, client_message, sizeof(client_message), 0) < 0){
             fprintf(stderr, "Couldn't receive\n");
-            return -1;
+            return;
         }
         exit = (*handler)(client_message, nw);
     }
     fprintf(stderr, "Connected host has closed connection. Closing listener thread\n");
-    return 0;
+    return;
 }
 
 void * rec_thread(void *args) {
