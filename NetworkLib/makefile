@@ -9,6 +9,8 @@ server:
 
 build: send server
 
+rebuild: clean build
+
 rebuild: clean send server
 
 test: build

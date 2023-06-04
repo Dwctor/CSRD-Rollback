@@ -166,7 +166,7 @@ struct network new_network(int rec_port, int send_port) {
     nw.receiver.port = rec_port;
     nw.sender.port = send_port;
     nw.self = &nw;
-    sprintf(nw.last_msg, "%c", MESSAGE_EXIT);
+    sprintf(nw.last_msg, "%c", MESSAGE_BEGIN);
     nw.connected = 0;
     nw.accepted = 0;
     return nw;
@@ -183,10 +183,10 @@ void network_end(struct network* nw) {
     char exit[2];
     sprintf(exit, "%c", MESSAGE_EXIT);
     send(nw->sender.desc, exit, strlen(exit), 0);
-//    printf("exit signal sent\n");
-//    pthread_join(nw->rec, NULL);
-//    printf("closed listener\n");
-//    pthread_join(nw->send, NULL);
+    printf("exit signal sent\n");
+    pthread_join(nw->rec, NULL);
+    printf("closed listener\n");
+    pthread_join(nw->send, NULL);
     
     // Closing the sockets:
     close(nw->receiver.desc);
