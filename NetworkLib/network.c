@@ -17,7 +17,7 @@ struct socket_wrapper {
     struct sockaddr_in socket;
 };
 
-void init_receiver(struct socket_wrapper* receiver) {
+void bind_receiving_socket(struct socket_wrapper* receiver) {
     // Create socket:
     int socket_desc = socket(AF_INET, SOCK_STREAM, 0);
     
@@ -49,7 +49,7 @@ void init_receiver(struct socket_wrapper* receiver) {
     receiver->desc = socket_desc;
 }
 
-void accept_client(int receiver_desc, struct socket_wrapper* client) {
+void accept_connection(int receiver_desc, struct socket_wrapper* client) {
     int client_size;
     int client_sock;
     // Accept an incoming connection:
@@ -139,8 +139,8 @@ void handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
 void * rec_thread(void *args) {
 //    struct socket_wrapper* wrappers = (struct socket_wrapper*)args;
     struct network* nw = (struct network*)args;
-    init_receiver(&(nw->receiver));
-    accept_client(nw->receiver.desc, &(nw->client));
+    bind_receiving_socket(&(nw->receiver));
+    accept_connection(nw->receiver.desc, &(nw->client));
     nw->accepted = 1;
     handle_msgs(nw, handler);
 }
