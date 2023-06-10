@@ -1,12 +1,12 @@
 #include <stdio.h>
-#include "network.c"
+#include "network.cpp"
 
 struct MESSAGE {
     int val;
 };
 
 char* SERIALIZE_MESSAGE(struct MESSAGE* m) {
-    char* str = malloc(sizeof(char)* BUF_SIZE);
+    char* str = (char*)malloc(sizeof(char)* BUF_SIZE);
     sprintf(str, "%d\n", m->val);
     return str;
 }
@@ -28,7 +28,7 @@ int main(int argc, char** argv) {
     int rec = 0;
     network_start(&nw);
     do {
-        rec = network_get(&m, &nw);
+        rec = network_get(&nw, &m);
     } while(rec == 0);
     printf("message after deserialization: %d\n", m.val);
     network_end(&nw);

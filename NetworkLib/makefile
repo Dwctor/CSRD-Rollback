@@ -2,16 +2,16 @@ clean:
 	rm server send
 
 send:
-	gcc send_message.c -o send
+	g++ -march=native send_message.cpp -o send
 
 server:
-	gcc server.c -o server
+	g++ -march=native server.cpp -o server
 
-build: send server
+test: send server
 
 rebuild: clean build
 
-rebuild: clean send server
+compile:
+	gcc -c message.c -o network.o
 
-test: build
-	./server 8080 8081
+retest: clean test

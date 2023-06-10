@@ -54,7 +54,7 @@ void accept_connection(int receiver_desc, struct socket_wrapper* client) {
     int client_sock;
     // Accept an incoming connection:
     client_size = sizeof(client->socket);
-    client_sock = accept(receiver_desc, (struct sockaddr*)&(client->socket), &client_size);
+    client_sock = accept(receiver_desc, (struct sockaddr*)&(client->socket), (socklen_t*)&client_size);
     printf("Accepted client\n");
     
     if (client_sock < 0){
@@ -143,12 +143,15 @@ void * rec_thread(void *args) {
     accept_connection(nw->receiver.desc, &(nw->client));
     nw->accepted = 1;
     handle_msgs(nw, handler);
+    pthread_exit(NULL);
 }
 
 void * send_thread(void *args) {
     struct network* nw = (struct network*)args;
     connect_to_client(&(nw->sender));
     nw->connected = 1;
+    fprintf(stderr, "Exiting send thread");
+    pthread_exit(NULL);
 //    send_msgs(sender->desc);
 }
 
@@ -202,7 +205,7 @@ int network_send(struct network* nw, struct MESSAGE* m) {
     return send(nw->sender.desc, send_message, strlen(send_message), 0);
 }
 
-int network_get(struct MESSAGE* m, struct network* nw) {
+int network_get(struct network* nw, struct MESSAGE* m) {
     if (nw->last_msg[0] == MESSAGE_BEGIN) {
         return 0;
     }
