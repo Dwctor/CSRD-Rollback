@@ -2,6 +2,7 @@
 #include <stdio.h>
 #include <math.h>
 #include "raylib.h"
+#include "network.h"
 
 // This game prototype will only simulate the chaser side, called Player. In the final game we need both a Player and a Adversary point of view.
 
@@ -59,9 +60,20 @@ void GameLoop(GameState &S);
 //Returns the euclidean distance of two Vector2 points.
 double EuclideanDistance(Vector2 a, Vector2 b);
 
-int main(void){
+int main(int argc, char **argv){
+    if (argc != 3) {
+        fprintf(stderr,
+                "client and target ports must be parameterized: "
+                "./game <client port> <target port>");
+    }
+    int rec_port = atoi(argv[1]);
+    int send_port = atoi(argv[2]);
+    struct network nw = new_network(rec_port, send_port);
+    struct MESSAGE rec_m, send_m;
+    int counter = 0;
     GameState S;
 
+    network_start(&nw);
     InitGame(S);
 
     // Main game loop
@@ -86,6 +98,7 @@ int main(void){
     }
 
     // De-Initialization
+    network_end(&nw);
     //--------------------------------------------------------------------------------------
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
