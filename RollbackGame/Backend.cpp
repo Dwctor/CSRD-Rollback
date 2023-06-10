@@ -1,6 +1,7 @@
 #include <stdio.h>
-#include <math.h>
-#include "Game.h"
+#include <stdlib.h>
+#include "Backend.h"
+#include "Common.h"
 
 void VerifyPrediction(RBState &R, MESSAGE M){
   long ServerCurrentFrame = M.CurrentFrame;
@@ -31,7 +32,7 @@ void VerifyPrediction(RBState &R, MESSAGE M){
 }
 
 bool HasPredictionFailed(GameState a, GameState b){
-  if(a.AdversaryInput.x != b.AdversaryInput.x || a.AdversaryInput.y != b.AdversaryInput.y){
+  if(a.PlayerInput.x != b.PlayerInput.x || a.PlayerInput.y != b.PlayerInput.y){
     return true;
   }
   return false;
@@ -46,22 +47,24 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   }
 
   // Fixes one frame. 
-  R.S[RBF].AdversaryInput.x = S.AdversaryInput.x;
-  R.S[RBF].AdversaryInput.y = S.AdversaryInput.y;
-  R.S[RBF].AdversaryPos.x = S.AdversaryPos.x;
-  R.S[RBF].AdversaryPos.y = S.AdversaryPos.y;
+  R.S[RBF].PlayerInput.x = S.PlayerInput.x;
+  R.S[RBF].PlayerInput.y = S.PlayerInput.y;
+  R.S[RBF].PlayerPos.x = S.PlayerPos.x;
+  R.S[RBF].PlayerPos.y = S.PlayerPos.y;
+  R.S[RBF].Points = S.Points;
   
   //Fixes the rest of the FDiff - 1 Frames.
   R.CurrentFrame = R.CurrentFrame - FDiff;
-  for(int i = 0; i < FDiff - 1; i++) GameLoop(R);
+  for(int i = 0; i < FDiff - 1; i++) ServerLoop(R);
 
 }
 
-void GameLoop(RBState &R){
+void ServerLoop(RBState &R){
     R.CurrentFrame++;
 
     CopyLastState(R); 
-    UpdatePlayerInput(R);
+
+    UpdateAdversaryInput(R);
 
     UpdatePlayerPos(R);
     UpdateAdversaryPos(R);
@@ -74,14 +77,11 @@ void GameLoop(RBState &R){
     fflush(stdout);
 }
 
-
-void UpdatePlayerInput(RBState &R){
-    int RBF = R.CurrentFrame%60;
-    R.S[RBF].PlayerInput.x = 0;
-    R.S[RBF].PlayerInput.y = 0;
-    if (IsKeyDown(KEY_RIGHT)) R.S[RBF].PlayerInput.x = 1;
-    if (IsKeyDown(KEY_LEFT)) R.S[RBF].PlayerInput.x = -1;
-    if (IsKeyDown(KEY_UP)) R.S[RBF].PlayerInput.y = -1;
-    if (IsKeyDown(KEY_DOWN)) R.S[RBF].PlayerInput.y = +1;
+//Every ADV_CHANGE_DIR Frames randomly chooses a direction to go.
+void UpdateAdversaryInput(RBState &R){
+  int RBF = R.CurrentFrame % 60;
+  if(R.CurrentFrame % ADV_CHANGE_DIR == 0){
+    R.S[RBF].AdversaryInput.x = rand()%3 - 1;
+    R.S[RBF].AdversaryInput.y = rand()%3 - 1;
+  }
 }
-
