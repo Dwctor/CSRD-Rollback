@@ -70,8 +70,8 @@ void GameLoop(RBState &R){
     UpdatePointsCount(R);
 
 
-    printf("Updated a frame!.\n");
-    fflush(stdout);
+//    printf("Updated a frame!.\n");
+//    fflush(stdout);
 }
 
 

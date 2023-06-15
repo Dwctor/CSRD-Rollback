@@ -2,6 +2,8 @@
 #define GAME_H
 #include "Common.h"
 #include <raylib.h>
+#include "../NetworkLib/network.h"
+#include "message.h"
 
 void VerifyPrediction(RBState &R, MESSAGE M);
 

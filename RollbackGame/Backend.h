@@ -1,6 +1,7 @@
 #ifndef BACKEND_H
 #define BACKEND_H
 #include "Common.h"
+#include "message.h"
 
 #define ADV_CHANGE_DIR 30
 

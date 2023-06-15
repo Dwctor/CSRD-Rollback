@@ -38,11 +38,6 @@ typedef struct RBState{
     long CurrentFrame;
 }RBState;
 
-typedef struct MESSAGE{
-  GameState S;
-  long CurrentFrame;
-}MESSAGE;
-
 void InitGame(RBState &);
 
 void InitState(RBState &);

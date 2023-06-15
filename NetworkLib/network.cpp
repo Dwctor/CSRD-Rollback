@@ -5,17 +5,7 @@
 #include <arpa/inet.h> // for sockets
 #include <unistd.h> // just for the close() function
 #include <pthread.h>
-#define BUF_SIZE 256
-#define MESSAGE_EXIT 'x'
-#define MESSAGE_BEGIN 'b'
-
-// Reference: https://www.educative.io/answers/how-to-implement-tcp-sockets-in-c
-
-struct socket_wrapper {
-    int port;
-    int desc;
-    struct sockaddr_in socket;
-};
+#include "network.h"
 
 void bind_receiving_socket(struct socket_wrapper* receiver) {
     // Create socket:
@@ -95,27 +85,8 @@ void clean_buffer(char* cli_msg) {
     memset(cli_msg, '\0', sizeof(cli_msg));
 }
 
-// MESSAGE types must be defined in the file that imports this library.
-struct MESSAGE;
-char* SERIALIZE_MESSAGE(struct MESSAGE* m);
-void DESERIALIZE_MESSAGE(struct MESSAGE* m, char* msg);
-
-struct network {
-    pthread_t rec;
-    pthread_t send;
-    int connected;
-    int accepted;
-    struct socket_wrapper sender;
-    struct socket_wrapper receiver;
-    struct socket_wrapper client;
-    char last_msg[BUF_SIZE];
-    struct network* self;
-};
-
-
 int handler(char* msg, struct network* nw) {
-    fprintf(stderr, "Msg from client: %s\n", msg);
-    strcpy(nw->last_msg, msg);
+    memcpy(nw->last_msg, msg, BUF_SIZE);
     return (msg[0] == MESSAGE_EXIT);
 }
 
@@ -169,7 +140,7 @@ struct network new_network(int rec_port, int send_port) {
     nw.receiver.port = rec_port;
     nw.sender.port = send_port;
     nw.self = &nw;
-    sprintf(nw.last_msg, "%c", MESSAGE_BEGIN);
+    nw.last_msg[0] = MESSAGE_BEGIN;
     nw.connected = 0;
     nw.accepted = 0;
     return nw;
@@ -198,11 +169,11 @@ void network_end(struct network* nw) {
 
 int network_send(struct network* nw, struct MESSAGE* m) {
     while(nw->connected == 0);
-    char send_message[BUF_SIZE];
-    strcpy(send_message, SERIALIZE_MESSAGE(m));
+    uint8_t send_message[BUF_SIZE];
+    SERIALIZE_MESSAGE(m, send_message);
 //    sprintf(send_message, "%s\n", send_message);
-    fprintf(stderr, "sending message: %s\n", send_message);
-    return send(nw->sender.desc, send_message, strlen(send_message), 0);
+//    fprintf(stderr, "sending message: %s\n", send_message);
+    return send(nw->sender.desc, send_message, sizeof(send_message), 0);
 }
 
 int network_get(struct network* nw, struct MESSAGE* m) {

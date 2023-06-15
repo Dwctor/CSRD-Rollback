@@ -73,8 +73,8 @@ void ServerLoop(RBState &R){
     UpdatePointsCount(R);
 
 
-    printf("Updated a frame!.\n");
-    fflush(stdout);
+//    printf("Updated a frame!.\n");
+//    fflush(stdout);
 }
 
 //Every ADV_CHANGE_DIR Frames randomly chooses a direction to go.

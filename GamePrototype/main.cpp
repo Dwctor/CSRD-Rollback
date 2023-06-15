@@ -95,6 +95,15 @@ int main(int argc, char **argv){
         DrawState(S); 
 
         //----------------------------------------------------------------------------------
+        ++counter;
+        if (counter == 2) {
+            counter = 0;
+            serialize_state(&m);
+            network_send(&nw, &send_m);
+        }
+        if (network_get(&nw, &rec_m)) {
+            fprintf(stderr, "Got state: ");
+        }
     }
 
     // De-Initialization

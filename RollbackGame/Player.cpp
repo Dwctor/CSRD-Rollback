@@ -5,14 +5,25 @@
 
 #include "Game.h"
 #include "Common.h"
+#include "../NetworkLib/network.h"
+#include "message.h"
 
+int main(int argc, char **argv) {
+    if (argc != 3) {
+        fprintf(stderr,
+                "client and target ports must be parameterized: "
+                "./game <client port> <target port>");
+    }
+    int rec_port = atoi(argv[1]);
+    int send_port = atoi(argv[2]);
+    struct network nw = new_network(rec_port, send_port);
+    struct MESSAGE rec_m, send_m;
+    int counter = 0;
 
-int main(void){
     RBState R;
-    MESSAGE M;
 
     InitGame(R);
-
+    network_start(&nw);         // Open network connection
     // Main game loop
     while (!WindowShouldClose()){    // Detect window close button or ESC key
         //----------------------------------------------------------------------------------
@@ -26,10 +37,21 @@ int main(void){
         //----------------------------------------------------------------------------------
         
         //SendStateInMessage(R);
+//        if (++counter == 3) {
+//            counter = 0;
+//            send_m.S = R.S[59];
+//            send_m.CurrentFrame = R.CurrentFrame;
+//            network_send(&nw, &send_m);
+//        }
+//        /*while(GetMessage(M)){
+//          VerifyPrediction(R, M);
+//        }*/
+        if (network_get(&nw, &rec_m)) {
+            fprintf(stderr, "Received adversary pos: %.2f, %.2f\n", rec_m.S.AdversaryPos.x, rec_m.S.AdversaryPos.y);
+            fprintf(stderr, "Received player pos: %.2f, %.2f\n", rec_m.S.PlayerPos.x, rec_m.S.PlayerPos.y);
+//            VerifyPrediction(R, rec_m);
+        }
 
-        /*while(GetMessage(M)){
-          VerifyPrediction(R, M);
-        }*/
         
         //----------------------------------------------------------------------------------
         // Draw section
@@ -42,6 +64,7 @@ int main(void){
 
     // De-Initialization
     //--------------------------------------------------------------------------------------
+    network_end(&nw);     // Close network connection
     CloseWindow();        // Close window and OpenGL context
     //--------------------------------------------------------------------------------------
 
