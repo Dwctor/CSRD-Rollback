@@ -3,6 +3,7 @@
 #include <sys/socket.h> // for inet_addr
 #include <arpa/inet.h> // for sockets
 #include <unistd.h> // just for the close() function
+#include <cstdint>
 #define BUF_SIZE 1024
 #define MESSAGE_EXIT 'x'
 #define MESSAGE_BEGIN 'b'
