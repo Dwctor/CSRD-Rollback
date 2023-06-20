@@ -19,6 +19,7 @@ int main(int argc, char **argv) {
     struct network nw = new_network(rec_port, send_port);
     struct MESSAGE rec_m, send_m;
     int counter = 0;
+    int num_rollbacks = 0;
 
     RBState R;
 
@@ -36,20 +37,31 @@ int main(int argc, char **argv) {
         // Network Update and Rollback Section
         //----------------------------------------------------------------------------------
         
-        //SendStateInMessage(R);
-//        if (++counter == 3) {
-//            counter = 0;
-//            send_m.S = R.S[59];
-//            send_m.CurrentFrame = R.CurrentFrame;
-//            network_send(&nw, &send_m);
-//        }
-//        /*while(GetMessage(M)){
-//          VerifyPrediction(R, M);
-//        }*/
-        if (network_get(&nw, &rec_m)) {
-            fprintf(stderr, "Received adversary pos: %.2f, %.2f\n", rec_m.S.AdversaryPos.x, rec_m.S.AdversaryPos.y);
-            fprintf(stderr, "Received player pos: %.2f, %.2f\n", rec_m.S.PlayerPos.x, rec_m.S.PlayerPos.y);
-//            VerifyPrediction(R, rec_m);
+        if (++counter == 10) {
+            counter = 0;
+            send_m.S = R.S[R.CurrentFrame % RB_FRAMES];
+            send_m.CurrentFrame = R.CurrentFrame;
+            network_send(&nw, &send_m);
+            //SendStateInMessage(R);
+            if (network_get(&nw, &rec_m)) {
+                fprintf(stderr,
+                        "Received frame: %d, currently in frame: %d\n",
+                        rec_m.CurrentFrame,
+                        R.CurrentFrame);
+//                fprintf(stderr,
+//                        "Received adversary pos: %.2f, %.2f\n",
+//                        rec_m.S.AdversaryPos.x,
+//                        rec_m.S.AdversaryPos.y);
+//                fprintf(stderr,
+//                        "Received player pos: %.2f, %.2f\n",
+//                        rec_m.S.PlayerPos.x,
+//                        rec_m.S.PlayerPos.y);
+                VerifyPrediction(R, rec_m);
+//                ++num_rollbacks;
+//                fprintf(stderr,
+//                        "%d predictions verified\n",
+//                        num_rollbacks);
+            }
         }
 
         
