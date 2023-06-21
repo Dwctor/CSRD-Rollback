@@ -110,3 +110,17 @@ double EuclideanDistance(Vector2 a, Vector2 b){
     return dist;
 }
 
+void LogicLoop(RBState &R){
+    R.CurrentFrame++;
+
+    CopyLastState(R); 
+
+    UpdatePlayerPos(R);
+    UpdateAdversaryPos(R);
+    UpdateTrailPos(R);
+
+    UpdatePointsCount(R);
+
+//    printf("Updated a frame!.\n");
+//    fflush(stdout);
+}

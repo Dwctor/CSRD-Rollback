@@ -18,7 +18,7 @@ int main(int argc, char **argv) {
     int send_port = atoi(argv[2]);
     struct network nw = new_network(rec_port, send_port);
     struct MESSAGE rec_m, send_m;
-    int counter = 0;
+    int counter = COUNTER_MESSAGE - 1;
     int num_rollbacks = 0;
 
     RBState R;
@@ -37,7 +37,7 @@ int main(int argc, char **argv) {
         // Network Update and Rollback Section
         //----------------------------------------------------------------------------------
         
-        if (++counter == 10) {
+        if (++counter == COUNTER_MESSAGE) {
             counter = 0;
             send_m.S = R.S[R.CurrentFrame % RB_FRAMES];
             send_m.CurrentFrame = R.CurrentFrame;

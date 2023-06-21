@@ -65,7 +65,7 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
   R.CurrentFrame = R.CurrentFrame - FDiff;
   fprintf(stderr, "R.CurrentFrame after: %d\n", R.CurrentFrame);
-  for(int i = 0; i < FDiff - 1; i++) ServerLoop(R);
+  for(int i = 0; i < FDiff - 1; i++) LogicLoop(R);
 
 }
 
