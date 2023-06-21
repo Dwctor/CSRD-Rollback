@@ -35,6 +35,24 @@ void CopyLastState(RBState &R){
   R.S[RBF] = R.S[RBF - 1];
 }
 
+void CopyLastPos(RBState &R){
+  int RBF = R.CurrentFrame%60;
+  if(RBF==0){
+    R.S[RBF].PlayerPos.x = R.S[RB_FRAMES-1].PlayerPos.x;
+    R.S[RBF].PlayerPos.y = R.S[RB_FRAMES-1].PlayerPos.y;
+    R.S[RBF].AdversaryPos.x = R.S[RB_FRAMES-1].AdversaryPos.x;
+    R.S[RBF].AdversaryPos.y = R.S[RB_FRAMES-1].AdversaryPos.y;
+    R.S[RBF].Points = R.S[RB_FRAMES-1].Points;
+    return;
+  }
+  R.S[RBF].PlayerPos.x = R.S[RBF-1].PlayerPos.x;
+  R.S[RBF].PlayerPos.y = R.S[RBF-1].PlayerPos.y;
+  R.S[RBF].AdversaryPos.x = R.S[RBF-1].AdversaryPos.x;
+  R.S[RBF].AdversaryPos.y = R.S[RBF-1].AdversaryPos.y;
+  R.S[RBF].Points = R.S[RBF-1].Points;
+  return;
+}
+
 void UpdatePlayerPos(RBState &R){
   int RBF = R.CurrentFrame%60;
   R.S[RBF].PlayerPos.x += R.S[RBF].PlayerInput.x * PLR_SPD;
@@ -113,7 +131,7 @@ double EuclideanDistance(Vector2 a, Vector2 b){
 void LogicLoop(RBState &R){
     R.CurrentFrame++;
 
-    CopyLastState(R); 
+    CopyLastPos(R); 
 
     UpdatePlayerPos(R);
     UpdateAdversaryPos(R);

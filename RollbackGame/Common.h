@@ -7,7 +7,7 @@ const int screenHeight = 720;
 
 #define FPS 60       // The Frames Per Second of the game.
 #define RB_FRAMES 60 // The ammount of frames the rollback can go back to.
-#define COUNTER_MESSAGE 10 // The ammount of frames to send and receive rollback information.
+#define COUNTER_MESSAGE 3 // The ammount of frames to send and receive rollback information.
 
 // These defines quickly tweak the behaviour of the game. In this short example we keep them here, but in the final project they should be moved to their own header.
 #define TRAIL_S 50
