@@ -35,12 +35,23 @@ void VerifyPrediction(RBState &R, MESSAGE M){
 }
 
 bool HasPredictionFailed(GameState a, GameState b){
-  if(a.AdversaryInput.x != b.AdversaryInput.x || a.AdversaryInput.y != b.AdversaryInput.y){
-    fprintf(stderr, "Got predfailed\n");
-    return true;
+  if(a.AdversaryInput.x != b.AdversaryInput.x || a.AdversaryInput.y != b.AdversaryInput.y ||
+    a.AdversaryPos.x != b.AdversaryPos.x || a.AdversaryPos.y != b.AdversaryPos.y){
+      fprintf(stderr, "Got predfailed\n");
+      return true;
+    
   }
   fprintf(stderr, "Got success\n");
   return false;
+}
+
+void print_trail(RBState &R){
+  int RBF = R.CurrentFrame % RB_FRAMES;
+  for(int i = 0; i < TRAIL_S - 40; i++){
+    printf("%.0f %.0f; ", R.S[RBF].Trail[i].x, R.S[RBF].Trail[i].y);
+  }
+  printf("\nWith ADV %.0f %.0f\n", R.S[RBF].AdversaryPos.x, R.S[RBF].AdversaryPos.y);
+  fflush(stdin);
 }
 
 // Given that the prediction was wrong, does the rollback operation.
@@ -52,22 +63,26 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   }
   RBF %= 60;
 
+  printf("Trail before was:");
+  print_trail(R);
   // Fixes one frame. 
   R.S[RBF].AdversaryInput.x = S.AdversaryInput.x;
   R.S[RBF].AdversaryInput.y = S.AdversaryInput.y;
   R.S[RBF].AdversaryPos.x = S.AdversaryPos.x;
   R.S[RBF].AdversaryPos.y = S.AdversaryPos.y;
-  R.S[RBF].Trail[0].x = R.S[RBF].AdversaryPos.x;
-  R.S[RBF].Trail[0].y = R.S[RBF].AdversaryPos.y;
   
   //Fixes the rest of the FDiff - 1 Frames.
-  fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
-  fprintf(stderr, "PlayerPos before: %4f %4f\n", R.S[R.CurrentFrame%60].PlayerPos.x, R.S[R.CurrentFrame%60].PlayerPos.y);
+  //fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
+  //fprintf(stderr, "PlayerPos before: %4f %4f\n", R.S[R.CurrentFrame%60].PlayerPos.x, R.S[R.CurrentFrame%60].PlayerPos.y);
   R.CurrentFrame = R.CurrentFrame - FDiff;
-  fprintf(stderr, "R.CurrentFrame during: %d\n", R.CurrentFrame);
+  printf("Trail past was:");
+  print_trail(R);
+  //fprintf(stderr, "R.CurrentFrame during: %d\n", R.CurrentFrame);
   for(int i = 0; i < FDiff; i++) LogicLoop(R);
-  fprintf(stderr, "PlayerPos after: %4f %4f\n", R.S[R.CurrentFrame%60].PlayerPos.x, R.S[R.CurrentFrame%60].PlayerPos.y);
-  fprintf(stderr, "R.CurrentFrame after: %d\n", R.CurrentFrame);
+  printf("Trail now is:");
+  print_trail(R);
+  //fprintf(stderr, "PlayerPos after: %4f %4f\n", R.S[R.CurrentFrame%60].PlayerPos.x, R.S[R.CurrentFrame%60].PlayerPos.y);
+  //fprintf(stderr, "R.CurrentFrame after: %d\n", R.CurrentFrame);
 
 }
 
@@ -100,6 +115,8 @@ void LogicLoop(RBState &R){
   UpdateAdversaryPos(R);
   UpdateTrailPos(R);
 
+  printf("Trail during was:");
+  print_trail(R);
   UpdatePointsCount(R);
 }
 

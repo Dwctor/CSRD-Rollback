@@ -34,9 +34,11 @@ void VerifyPrediction(RBState &R, MESSAGE M){
 }
 
 bool HasPredictionFailed(GameState a, GameState b){
-  if(a.PlayerInput.x != b.PlayerInput.x || a.PlayerInput.y != b.PlayerInput.y){
-    fprintf(stderr, "Got predfailed\n");
-    return true;
+  if(a.PlayerInput.x != b.PlayerInput.x || a.PlayerInput.y != b.PlayerInput.y ||
+    a.PlayerPos.x != b.PlayerPos.x || a.PlayerPos.y != b.PlayerPos.y){
+      fprintf(stderr, "Got predfailed\n");
+      return true;
+    
   }
   fprintf(stderr, "Got predsuccess\n");
   return false;

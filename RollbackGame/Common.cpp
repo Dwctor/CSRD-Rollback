@@ -92,8 +92,8 @@ void UpdatePlayerPos(RBState &R){
 
 void UpdateAdversaryPos(RBState &R){
   int RBF = R.CurrentFrame%60;
-  R.S[RBF].AdversaryPos.x += R.S[RBF].AdversaryInput.x * PLR_SPD;
-  R.S[RBF].AdversaryPos.y += R.S[RBF].AdversaryInput.y * PLR_SPD;
+  R.S[RBF].AdversaryPos.x += R.S[RBF].AdversaryInput.x * ADV_SPD;
+  R.S[RBF].AdversaryPos.y += R.S[RBF].AdversaryInput.y * ADV_SPD;
 
   if(R.S[RBF].AdversaryPos.x < 0) R.S[RBF].AdversaryPos.x = 0;
   if(R.S[RBF].AdversaryPos.x > screenWidth) R.S[RBF].AdversaryPos.x = screenWidth;
@@ -103,11 +103,11 @@ void UpdateAdversaryPos(RBState &R){
 
 void UpdateTrailPos(RBState &R){
     int RBF = R.CurrentFrame%60;
-    R.S[RBF].Trail[0] = R.S[RBF].AdversaryPos;
 
     for(int i = TRAIL_S - 1; i > 0; i--){
         R.S[RBF].Trail[i] = R.S[RBF].Trail[i - 1];
     }
+    R.S[RBF].Trail[0] = R.S[RBF].AdversaryPos;
 }
 
 void UpdatePointsCount(RBState &R){
