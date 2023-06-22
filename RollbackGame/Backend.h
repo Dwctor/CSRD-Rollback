@@ -9,6 +9,7 @@ void VerifyPrediction(RBState &R, MESSAGE M);
 bool HasPredictionFailed(GameState a, GameState b);
 void RollBack(RBState &R, GameState S, int FDiff);
 void ServerLoop(RBState &R);
+void LogicLoop(RBState &R);
 void UpdateAdversaryInput(RBState &R);
 
 #endif // !BACKEND_H

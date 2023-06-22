@@ -57,6 +57,8 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   R.S[RBF].AdversaryInput.y = S.AdversaryInput.y;
   R.S[RBF].AdversaryPos.x = S.AdversaryPos.x;
   R.S[RBF].AdversaryPos.y = S.AdversaryPos.y;
+  R.S[RBF].Trail[0].x = R.S[RBF].AdversaryPos.x;
+  R.S[RBF].Trail[0].y = R.S[RBF].AdversaryPos.y;
   
   //Fixes the rest of the FDiff - 1 Frames.
   fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
@@ -73,6 +75,7 @@ void GameLoop(RBState &R){
     R.CurrentFrame++;
 
     CopyLastState(R); 
+    CopyLastAdversaryInput(R);
     UpdatePlayerInput(R);
 
     UpdatePlayerPos(R);
@@ -86,6 +89,19 @@ void GameLoop(RBState &R){
 //    fflush(stdout);
 }
 
+void LogicLoop(RBState &R){
+  R.CurrentFrame++;
+
+  CopyLastState(R); 
+  CopyLastAdversaryInput(R);
+  //UpdatePlayerInput(R);
+
+  UpdatePlayerPos(R);
+  UpdateAdversaryPos(R);
+  UpdateTrailPos(R);
+
+  UpdatePointsCount(R);
+}
 
 void UpdatePlayerInput(RBState &R){
     int RBF = R.CurrentFrame%60;

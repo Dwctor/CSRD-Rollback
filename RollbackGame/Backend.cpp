@@ -71,8 +71,29 @@ void ServerLoop(RBState &R){
     R.CurrentFrame++;
 
     CopyLastState(R); 
+    CopyLastPlayerInput(R);
+    CopyLastAdversaryInput(R);
 
     UpdateAdversaryInput(R);
+
+    UpdatePlayerPos(R);
+    UpdateAdversaryPos(R);
+    UpdateTrailPos(R);
+
+    UpdatePointsCount(R);
+
+
+//    printf("Updated a frame!.\n");
+//    fflush(stdout);
+}
+
+void LogicLoop(RBState &R){
+    R.CurrentFrame++;
+
+    CopyLastState(R); 
+    CopyLastPlayerInput(R);
+
+    //UpdateAdversaryInput(R);
 
     UpdatePlayerPos(R);
     UpdateAdversaryPos(R);

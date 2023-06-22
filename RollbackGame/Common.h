@@ -7,7 +7,7 @@ const int screenHeight = 720;
 
 #define FPS 60       // The Frames Per Second of the game.
 #define RB_FRAMES 60 // The ammount of frames the rollback can go back to.
-#define COUNTER_MESSAGE 3 // The ammount of frames to send and receive rollback information.
+#define COUNTER_MESSAGE 1 // The ammount of frames to send and receive rollback information.
 
 // These defines quickly tweak the behaviour of the game. In this short example we keep them here, but in the final project they should be moved to their own header.
 #define TRAIL_S 50
@@ -45,6 +45,10 @@ void InitState(RBState &);
 
 void CopyLastState(RBState &);
 
+void CopyLastPlayerInput(RBState &R);
+
+void CopyLastAdversaryInput(RBState &R);
+
 void UpdatePlayerPos(RBState &); 
 
 void UpdateAdversaryPos(RBState &);
@@ -60,7 +64,4 @@ void DrawState(GameState &);
 
 //Returns the euclidean distance of two Vector2 points.
 double EuclideanDistance(Vector2 a, Vector2 b);
-
-//Does the game/server loop without new inputs being provided.
-void LogicLoop(RBState &);
 #endif // !COMMON
