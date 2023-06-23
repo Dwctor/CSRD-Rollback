@@ -43,7 +43,7 @@ int main(int argc, char **argv) {
             send_m.CurrentFrame = R.CurrentFrame;
             network_send(&nw, &send_m);
             //SendStateInMessage(R);
-            if (network_get(&nw, &rec_m)) {
+            while (network_get(&nw, &rec_m)) {
                 fprintf(stderr,
                         "Received frame: %d, currently in frame: %d\n",
                         rec_m.CurrentFrame,
@@ -56,7 +56,7 @@ int main(int argc, char **argv) {
 //                        "Received player pos: %.2f, %.2f\n",
 //                        rec_m.S.PlayerPos.x,
 //                        rec_m.S.PlayerPos.y);
-                VerifyPrediction(R, rec_m);
+//                VerifyPrediction(R, rec_m);
 //                ++num_rollbacks;
 //                fprintf(stderr,
 //                        "%d predictions verified\n",

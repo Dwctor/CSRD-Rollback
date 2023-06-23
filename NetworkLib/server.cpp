@@ -11,8 +11,8 @@ char* SERIALIZE_MESSAGE(struct MESSAGE* m) {
     return str;
 }
 
-void DESERIALIZE_MESSAGE(struct MESSAGE* m, char* msg) {
-    m->val = atoi(msg);
+void DESERIALIZE_MESSAGE(struct MESSAGE* m, uint8_t* msg) {
+    m->val = atoi((char*)msg);
 }
 
 int main(int argc, char** argv) {

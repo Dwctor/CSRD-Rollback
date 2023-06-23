@@ -81,17 +81,40 @@ void connect_to_client(struct socket_wrapper* sender) {
     sender->desc = socket_desc;
 }
 
-void clean_buffer(char* cli_msg) {
+void clean_buffer(uint8_t* cli_msg) {
     memset(cli_msg, '\0', sizeof(cli_msg));
 }
 
-int handler(char* msg, struct network* nw) {
-    memcpy(nw->last_msg, msg, BUF_SIZE);
+void message_queue_pop(struct network* nw, uint8_t msg[BUF_SIZE]) {
+    memcpy(msg, nw->msg_queue->msg, BUF_SIZE);
+    struct msg_queue* free_addr = nw->msg_queue;
+    nw->msg_queue = nw->msg_queue->next;
+    free(free_addr);
+    if (nw->msg_tail == free_addr) {
+        nw->msg_tail = NULL;
+    }
+}
+
+int message_queue_append(struct network* nw, uint8_t* msg) {
+    struct msg_queue* tail = (struct msg_queue*)malloc(sizeof(struct msg_queue));
+    tail->next = NULL;
+    memcpy(tail->msg, msg, BUF_SIZE);
+    if (nw->msg_tail == NULL) {
+        nw->msg_queue = tail;
+    } else {
+        nw->msg_tail->next = tail;
+    }
+    nw->msg_tail = tail;
+    return (tail->msg[0] == MESSAGE_EXIT);
+}
+
+int handler(uint8_t* msg, struct network* nw) {
+    memcpy(nw->msg_queue, msg, BUF_SIZE);
     return (msg[0] == MESSAGE_EXIT);
 }
 
-void handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
-    char client_message[BUF_SIZE];
+void handle_msgs(struct network* nw, int (*handler)(struct network*, uint8_t*)) {
+    uint8_t client_message[BUF_SIZE];
     int exit = 0;
     fprintf(stderr, "Handling messages...\n");
     while (exit == 0) {
@@ -101,7 +124,7 @@ void handle_msgs(struct network* nw, int (*handler)(char*, struct network*)) {
             fprintf(stderr, "Couldn't receive\n");
             return;
         }
-        exit = (*handler)(client_message, nw);
+        exit = (*handler)(nw, client_message);
     }
     fprintf(stderr, "Connected host has closed connection. Closing listener thread\n");
     return;
@@ -113,7 +136,8 @@ void * rec_thread(void *args) {
     bind_receiving_socket(&(nw->receiver));
     accept_connection(nw->receiver.desc, &(nw->client));
     nw->accepted = 1;
-    handle_msgs(nw, handler);
+//    handle_msgs(nw, handler);
+    handle_msgs(nw, message_queue_append);
     pthread_exit(NULL);
 }
 
@@ -140,7 +164,9 @@ struct network new_network(int rec_port, int send_port) {
     nw.receiver.port = rec_port;
     nw.sender.port = send_port;
     nw.self = &nw;
-    nw.last_msg[0] = MESSAGE_BEGIN;
+//    nw.last_msg[0] = MESSAGE_BEGIN;
+    nw.msg_queue = NULL;
+    nw.msg_tail = NULL;
     nw.connected = 0;
     nw.accepted = 0;
     return nw;
@@ -177,10 +203,11 @@ int network_send(struct network* nw, struct MESSAGE* m) {
 }
 
 int network_get(struct network* nw, struct MESSAGE* m) {
-    if (nw->last_msg[0] == MESSAGE_BEGIN) {
+    if (nw->msg_queue == NULL) {
         return 0;
     }
-    DESERIALIZE_MESSAGE(m, nw->last_msg);
-    nw->last_msg[0] = MESSAGE_BEGIN;
+    uint8_t msg[BUF_SIZE];
+    message_queue_pop(nw, msg);
+    DESERIALIZE_MESSAGE(m, msg);
     return 1;
 }

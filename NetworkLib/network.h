@@ -15,6 +15,11 @@ struct socket_wrapper {
     struct sockaddr_in socket;
 };
 
+struct msg_queue {
+    uint8_t msg[BUF_SIZE];
+    struct msg_queue* next;
+};
+
 
 struct network {
     pthread_t rec;
@@ -24,7 +29,9 @@ struct network {
     struct socket_wrapper sender;
     struct socket_wrapper receiver;
     struct socket_wrapper client;
-    uint8_t last_msg[BUF_SIZE];
+//    uint8_t last_msg[BUF_SIZE];
+    struct msg_queue* msg_queue;
+    struct msg_queue* msg_tail;
     struct network* self;
 };
 //
