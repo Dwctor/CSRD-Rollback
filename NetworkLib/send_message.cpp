@@ -1,18 +1,18 @@
 #include <stdio.h>
-#include "network.c"
+#include "network.cpp"
 
 struct MESSAGE {
     int val;
 };
 
-char* SERIALIZE_MESSAGE(struct MESSAGE* m) {
-    char* str = malloc(sizeof(char)* BUF_SIZE);
+uint8_t* SERIALIZE_MESSAGE(struct MESSAGE* m) {
+    char* str = (char*)malloc(sizeof(char)* BUF_SIZE);
     sprintf(str, "%d", m->val);
     return str;
 }
 
-void DESERIALIZE_MESSAGE(struct MESSAGE* m, char* msg) {
-    m->val = atoi(msg);
+void DESERIALIZE_MESSAGE(struct MESSAGE* m, uint8_t* msg) {
+    m->val = atoi((char*)msg);
 }
 
 int main(int argc, char** argv) {

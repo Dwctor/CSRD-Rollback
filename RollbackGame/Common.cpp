@@ -29,10 +29,54 @@ void InitState(RBState &R){
 void CopyLastState(RBState &R){
   int RBF = R.CurrentFrame%60;
   if(RBF == 0){
-    R.S[RBF] = R.S[RB_FRAMES - 1];
+    R.S[RBF].PlayerPos.x = R.S[RB_FRAMES-1].PlayerPos.x;
+    R.S[RBF].PlayerPos.y = R.S[RB_FRAMES-1].PlayerPos.y;
+    R.S[RBF].AdversaryPos.x = R.S[RB_FRAMES-1].AdversaryPos.x;
+    R.S[RBF].AdversaryPos.y = R.S[RB_FRAMES-1].AdversaryPos.y;
+    R.S[RBF].Points = R.S[RB_FRAMES-1].Points;
+    R.S[RBF].TextSize = R.S[RB_FRAMES-1].TextSize;
+    for(int i = 0; i < TRAIL_S; i++){
+      R.S[RBF].Trail[i].x = R.S[RB_FRAMES-1].Trail[i].x;
+      R.S[RBF].Trail[i].y = R.S[RB_FRAMES-1].Trail[i].y;
+    }
     return;
   }
-  R.S[RBF] = R.S[RBF - 1];
+
+  R.S[RBF].PlayerPos.x = R.S[RBF-1].PlayerPos.x;
+  R.S[RBF].PlayerPos.y = R.S[RBF-1].PlayerPos.y;
+  R.S[RBF].AdversaryPos.x = R.S[RBF-1].AdversaryPos.x;
+  R.S[RBF].AdversaryPos.y = R.S[RBF-1].AdversaryPos.y;
+  R.S[RBF].Points = R.S[RBF-1].Points;
+  R.S[RBF].TextSize = R.S[RBF-1].TextSize;
+  for(int i = 0; i < TRAIL_S; i++){
+    R.S[RBF].Trail[i].x = R.S[RBF-1].Trail[i].x;
+    R.S[RBF].Trail[i].y = R.S[RBF-1].Trail[i].y;
+  }
+  return;
+}
+
+void CopyLastPlayerInput(RBState &R){
+  int RBF = R.CurrentFrame%60;
+  if(RBF==0){
+    R.S[RBF].PlayerInput.x = R.S[RB_FRAMES-1].PlayerInput.x;
+    R.S[RBF].PlayerInput.y = R.S[RB_FRAMES-1].PlayerInput.y;
+    return;
+  }
+  R.S[RBF].PlayerInput.x = R.S[RBF-1].PlayerInput.x;
+  R.S[RBF].PlayerInput.y = R.S[RBF-1].PlayerInput.y;
+  return;
+}
+
+void CopyLastAdversaryInput(RBState &R){
+  int RBF = R.CurrentFrame%60;
+  if(RBF==0){
+    R.S[RBF].AdversaryInput.x = R.S[RB_FRAMES-1].AdversaryInput.x;
+    R.S[RBF].AdversaryInput.y = R.S[RB_FRAMES-1].AdversaryInput.y;
+    return;
+  }
+  R.S[RBF].AdversaryInput.x = R.S[RBF-1].AdversaryInput.x;
+  R.S[RBF].AdversaryInput.y = R.S[RBF-1].AdversaryInput.y;
+  return;
 }
 
 void UpdatePlayerPos(RBState &R){
@@ -48,8 +92,8 @@ void UpdatePlayerPos(RBState &R){
 
 void UpdateAdversaryPos(RBState &R){
   int RBF = R.CurrentFrame%60;
-  R.S[RBF].AdversaryPos.x += R.S[RBF].AdversaryInput.x * PLR_SPD;
-  R.S[RBF].AdversaryPos.y += R.S[RBF].AdversaryInput.y * PLR_SPD;
+  R.S[RBF].AdversaryPos.x += R.S[RBF].AdversaryInput.x * ADV_SPD;
+  R.S[RBF].AdversaryPos.y += R.S[RBF].AdversaryInput.y * ADV_SPD;
 
   if(R.S[RBF].AdversaryPos.x < 0) R.S[RBF].AdversaryPos.x = 0;
   if(R.S[RBF].AdversaryPos.x > screenWidth) R.S[RBF].AdversaryPos.x = screenWidth;
@@ -59,11 +103,11 @@ void UpdateAdversaryPos(RBState &R){
 
 void UpdateTrailPos(RBState &R){
     int RBF = R.CurrentFrame%60;
-    R.S[RBF].Trail[0] = R.S[RBF].AdversaryPos;
 
     for(int i = TRAIL_S - 1; i > 0; i--){
         R.S[RBF].Trail[i] = R.S[RBF].Trail[i - 1];
     }
+    R.S[RBF].Trail[0] = R.S[RBF].AdversaryPos;
 }
 
 void UpdatePointsCount(RBState &R){
@@ -109,4 +153,3 @@ double EuclideanDistance(Vector2 a, Vector2 b){
 
     return dist;
 }
-
