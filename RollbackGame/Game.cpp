@@ -70,6 +70,7 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   R.S[RBF].AdversaryInput.y = S.AdversaryInput.y;
   R.S[RBF].AdversaryPos.x = S.AdversaryPos.x;
   R.S[RBF].AdversaryPos.y = S.AdversaryPos.y;
+  R.S[RBF].Trail[0] = S.AdversaryPos;
   
   //Fixes the rest of the FDiff - 1 Frames.
   //fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
