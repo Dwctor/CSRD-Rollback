@@ -59,7 +59,7 @@ int main(int argc, char **argv) {
 //                        "Received player pos: %.2f, %.2f\n",
 //                        rec_m.S.PlayerPos.x,
 //                        rec_m.S.PlayerPos.y);
-//                VerifyPrediction(R, rec_m);
+                VerifyPrediction(R, rec_m);
 //                ++num_rollbacks;
 //                fprintf(stderr,
 //                        "%d predictions verified\n",
