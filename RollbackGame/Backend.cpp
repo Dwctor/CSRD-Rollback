@@ -6,7 +6,6 @@
 void VerifyPrediction(RBState &R, MESSAGE M){
   long ServerCurrentFrame = M.CurrentFrame;
   GameState S = M.S;
-  fprintf(stderr, "Got servercurrentframe: %d\n", ServerCurrentFrame);
 
   int FDiff = R.CurrentFrame - ServerCurrentFrame; 
   fprintf(stderr, "Got FDiff: %d\n", FDiff);
@@ -22,13 +21,11 @@ void VerifyPrediction(RBState &R, MESSAGE M){
   }
 
   int RBF = R.CurrentFrame - FDiff;
-  fprintf(stderr, "Got first RBF: %d\n", RBF);
 
   if(RBF < 0){
     RBF += RB_FRAMES;
   }
   RBF %= 60;
-  fprintf(stderr, "Got second RBF: %d\n", RBF);
 
   if(HasPredictionFailed(R.S[RBF], S)){
     RollBack(R, S, FDiff);
@@ -37,9 +34,11 @@ void VerifyPrediction(RBState &R, MESSAGE M){
 }
 
 bool HasPredictionFailed(GameState a, GameState b){
-  if(a.PlayerInput.x != b.PlayerInput.x || a.PlayerInput.y != b.PlayerInput.y){
-    fprintf(stderr, "Got predfailed\n");
-    return true;
+  if(a.PlayerInput.x != b.PlayerInput.x || a.PlayerInput.y != b.PlayerInput.y ||
+    a.PlayerPos.x != b.PlayerPos.x || a.PlayerPos.y != b.PlayerPos.y){
+      fprintf(stderr, "Got predfailed\n");
+      return true;
+    
   }
   fprintf(stderr, "Got predsuccess\n");
   return false;
@@ -64,8 +63,9 @@ void RollBack(RBState &R, GameState S, int FDiff){ //FDiff is a positive, < RB_F
   //Fixes the rest of the FDiff - 1 Frames.
   fprintf(stderr, "R.CurrentFrame before: %d\n", R.CurrentFrame);
   R.CurrentFrame = R.CurrentFrame - FDiff;
-  fprintf(stderr, "R.CurrentFrame after: %d\n", R.CurrentFrame);
+  fprintf(stderr, "R.CurrentFrame during: %d\n", R.CurrentFrame);
   for(int i = 0; i < FDiff; i++) LogicLoop(R);
+  fprintf(stderr, "R.CurrentFrame after: %d\n", R.CurrentFrame);
 
 }
 
@@ -73,8 +73,29 @@ void ServerLoop(RBState &R){
     R.CurrentFrame++;
 
     CopyLastState(R); 
+    CopyLastPlayerInput(R);
+    CopyLastAdversaryInput(R);
 
     UpdateAdversaryInput(R);
+
+    UpdatePlayerPos(R);
+    UpdateAdversaryPos(R);
+    UpdateTrailPos(R);
+
+    UpdatePointsCount(R);
+
+
+//    printf("Updated a frame!.\n");
+//    fflush(stdout);
+}
+
+void LogicLoop(RBState &R){
+    R.CurrentFrame++;
+
+    CopyLastState(R); 
+    CopyLastPlayerInput(R);
+
+    //UpdateAdversaryInput(R);
 
     UpdatePlayerPos(R);
     UpdateAdversaryPos(R);

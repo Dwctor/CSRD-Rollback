@@ -43,11 +43,11 @@ int main(int argc, char **argv) {
             send_m.CurrentFrame = R.CurrentFrame;
             network_send(&nw, &send_m);
             //SendStateInMessage(R);
-            while (network_get(&nw, &rec_m)) {
-                //fprintf(stderr,
-                //       "Received frame: %d, currently in frame: %d\n",
-                //        rec_m.CurrentFrame,
-                //        R.CurrentFrame);
+            if (network_get(&nw, &rec_m)) {
+                fprintf(stderr,
+                        "Received frame: %d, currently in frame: %d\n",
+                        rec_m.CurrentFrame,
+                        R.CurrentFrame);
 //                fprintf(stderr,
 //                        "Received adversary pos: %.2f, %.2f\n",
 //                        rec_m.S.AdversaryPos.x,
@@ -64,7 +64,8 @@ int main(int argc, char **argv) {
             }
         }
 
-        
+        printf("Frame\n");
+        fflush(stdin);
         //----------------------------------------------------------------------------------
         // Draw section
         //----------------------------------------------------------------------------------

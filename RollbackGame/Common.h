@@ -45,6 +45,10 @@ void InitState(RBState &);
 
 void CopyLastState(RBState &);
 
+void CopyLastPlayerInput(RBState &R);
+
+void CopyLastAdversaryInput(RBState &R);
+
 void UpdatePlayerPos(RBState &); 
 
 void UpdateAdversaryPos(RBState &);
@@ -60,7 +64,4 @@ void DrawState(GameState &);
 
 //Returns the euclidean distance of two Vector2 points.
 double EuclideanDistance(Vector2 a, Vector2 b);
-
-//Does the game/server loop without new inputs being provided.
-void LogicLoop(RBState &);
 #endif // !COMMON

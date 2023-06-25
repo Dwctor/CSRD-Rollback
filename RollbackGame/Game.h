@@ -17,4 +17,6 @@ void UpdatePlayerInput(RBState &);
 //Runs the main game loop (the state update part), which includes updating all positions.
 void GameLoop(RBState &);
 
+void LogicLoop(RBState &);
+
 #endif // !GAMEH
