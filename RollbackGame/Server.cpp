@@ -46,7 +46,7 @@ int main(int argc, char **argv) {
             send_m.CurrentFrame = R.CurrentFrame;
             network_send(&nw, &send_m);
             //SendStateInMessage(R);
-            if (network_get(&nw, &rec_m)) {
+            while (network_get(&nw, &rec_m)) {
                 fprintf(stderr,
                         "Received frame: %d, currently in frame: %d\n",
                         rec_m.CurrentFrame,
